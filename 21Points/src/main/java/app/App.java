@@ -3,6 +3,12 @@ package app;
 import javax.swing.*;
 
 public class App {
+
+    //整个游戏有两个状态，一个是MENU一个是MAIN，用于不同frame的切换
+    enum STATE{
+        MENU, GAME
+    };
+
     public static JFrame menuFrame = new JFrame();
     public static JFrame gameFrame = new JFrame();
 
@@ -41,8 +47,4 @@ public class App {
         gameFrame.setVisible(true);
     }
 
-    //整个游戏有两个状态，一个是MENU一个是MAIN，用于不同frame的切换
-    enum STATE{
-        MENU, GAME
-    };
 }
