@@ -72,6 +72,13 @@ public class Game extends JComponent implements ActionListener {
     @Override
     public void paintComponent(Graphics g){
         Graphics2D g2 = (Graphics2D) g;
+        try {
+            backgroundImg = ImageIO.read(new File("resources/background.png")); //读取背景
+        }
+        catch(IOException e) {
+            System.out.println("背景图片读取失败");
+        }
+        g2.drawImage(backgroundImg,0,0,null);
 
         if (pointer < playerList.size() && pointer >= 0) {
             currantPlayer = playerList.get(pointer);
@@ -82,12 +89,12 @@ public class Game extends JComponent implements ActionListener {
         if (pointer >= playerList.size()) {
             g2.setColor(Color.RED);
         } else {
-            g2.setColor(Color.BLACK);
+            g2.setColor(Color.white);
         }
         g2.setFont(new Font("Comic Sans MS", Font.BOLD, 30));
         g2.drawString("DEALER", 750, 50);
 
-        g2.setColor(Color.BLACK);
+        g2.setColor(Color.white);
         btnHit.setBounds(510, 750, 100, 50);
         btnHit.setFont(new Font("Comic Sans MS", Font.BOLD, 16));
 
@@ -109,7 +116,7 @@ public class Game extends JComponent implements ActionListener {
             if (i == currantPlayer.id) {
                 g2.setColor(Color.RED);
             } else {
-                g2.setColor(Color.BLACK);
+                g2.setColor(Color.white);
             }
             g2.drawString("PLAYER" + i, 50 + PLAYER_AREA_WIDTH * i, 300);
 
@@ -126,7 +133,7 @@ public class Game extends JComponent implements ActionListener {
         if (pointer >= playerList.size()) {
             g2.setColor(Color.RED);
         } else {
-            g2.setColor(Color.BLACK);
+            g2.setColor(Color.white);
         }
         List<Card> dealerCardList = ((GameParticipate)dealer).getCardList();
 
