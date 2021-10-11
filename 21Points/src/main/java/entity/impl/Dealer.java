@@ -69,6 +69,11 @@ public class Dealer extends GameParticipate implements IDealer {
             System.out.println("玩家" + gameParticipate.id + "爆掉，庄家胜利，玩家余额:" + gameParticipate.money);
             return 2;
         }
+        else if (this.getScore() == gameParticipate.getScore()) {
+            this.giveMoney(gameParticipate, 0);
+            System.out.println("庄家和玩家" + gameParticipate.id + "点数相等，" + "平局，玩家余额:" + gameParticipate.money);
+            return 0;
+        }
         else {
             System.out.println("清算时出现了处理不了的状况");
             return -1;
