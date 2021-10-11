@@ -3,10 +3,14 @@ package app;
 import entity.GameParticipate;
 import entity.impl.*;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +22,7 @@ public class Game extends JComponent implements ActionListener {
 
     private List<GameParticipate> playerList;
     private Dealer dealer;
+    private BufferedImage backgroundImg;
 
     // 标识当前回合在哪个玩家
     private int pointer;
@@ -56,8 +61,16 @@ public class Game extends JComponent implements ActionListener {
     public void paintComponent(Graphics g){
         Graphics2D g2 = (Graphics2D) g;
         g2.setFont(new Font("Comic Sans MS", Font.BOLD, 30));
-        g2.setColor(Color.BLACK);
+        g2.setColor(Color.WHITE);
         setButton();
+
+        try {
+            backgroundImg = ImageIO.read(new File("resources/background.png")); //读取背景
+        }
+        catch(IOException e) {
+            System.out.println("背景图片读取失败");
+        }
+        g2.drawImage(backgroundImg,0,0,1530, 865,null);
 
         if (pointer < playerList.size()) {
             currantPlayer = playerList.get(pointer);
@@ -68,7 +81,7 @@ public class Game extends JComponent implements ActionListener {
         if (pointer >= playerList.size()) {
             g2.setColor(Color.RED);
         } else {
-            g2.setColor(Color.BLACK);
+            g2.setColor(Color.WHITE);
         }
         g2.drawString("DEALER", 750, 50);
 
@@ -78,7 +91,7 @@ public class Game extends JComponent implements ActionListener {
             if (i == currantPlayer.id) {
                 g2.setColor(Color.RED);
             } else {
-                g2.setColor(Color.BLACK);
+                g2.setColor(Color.WHITE);
             }
             g2.drawString("PLAYER" + i, 50 + PLAYER_AREA_WIDTH * i, 300);
 
@@ -101,7 +114,7 @@ public class Game extends JComponent implements ActionListener {
                 dealerCardList.get(i).printCards(g2, true, i, -1);
             }
         } else {
-            g2.setColor(Color.BLACK);
+            g2.setColor(Color.WHITE);
             g2.drawString("DEALER SCORE: ****", 50, 80);
             dealerCardList.get(0).printCards(g2, true, 0, -1);
         }
