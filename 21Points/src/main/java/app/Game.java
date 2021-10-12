@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,10 +20,13 @@ public class Game extends JComponent implements ActionListener {
     public static final int PLAYER_COUNT = 5;
     // 每个player在画面上所占的区域
     public static final int PLAYER_AREA_WIDTH = 300;
+    public static String showresult="";
 
     private List<GameParticipate> playerList;
+    private List<Integer>resultList;
     private Dealer dealer;
     private BufferedImage backgroundImg;
+    private BufferedImage resultImg;
 
     // 标识当前回合在哪个玩家
     private int pointer;
@@ -43,10 +47,11 @@ public class Game extends JComponent implements ActionListener {
         btnBet.addActionListener(this);
         btnStand.addActionListener(this);
         btnReStart.addActionListener(this);
-
         playerList = new ArrayList<>();
         dealer = new Dealer(new Hand(), 500000000, new Deck());
 
+
+        resultList = new ArrayList<>();
         for (int i = 0; i < PLAYER_COUNT; i++) {
             GameParticipate player = new Player(new Hand(), 500, i);
             playerList.add(player);
@@ -66,6 +71,7 @@ public class Game extends JComponent implements ActionListener {
 
         try {
             backgroundImg = ImageIO.read(new File("resources/background.png")); //读取背景
+
         }
         catch(IOException e) {
             System.out.println("背景图片读取失败");
@@ -93,11 +99,11 @@ public class Game extends JComponent implements ActionListener {
             } else {
                 g2.setColor(Color.WHITE);
             }
-            g2.drawString("PLAYER" + i, 50 + PLAYER_AREA_WIDTH * i, 300);
+            g2.drawString("PLAYER" + i, 50 + PLAYER_AREA_WIDTH * i, 350);
 
             g2.setFont(new Font("Comic Sans MS", Font.BOLD, 20));
-            g2.drawString("PLAYER SCORE: " + playerList.get(i).getScore(), 50 + PLAYER_AREA_WIDTH * i, 350);
-            g2.drawString("CURRENT MONEY: " + playerList.get(i).getMoney(), 50 + PLAYER_AREA_WIDTH * i, 400);
+            g2.drawString("PLAYER SCORE: " + playerList.get(i).getScore(), 50 + PLAYER_AREA_WIDTH * i, 400);
+            g2.drawString("CURRENT MONEY: " + playerList.get(i).getMoney(), 50 + PLAYER_AREA_WIDTH * i, 430);
 
             List<Card> currentCardList = playerList.get(i).getCardList();
             for (int j = 0; j < currentCardList.size(); j++) {
@@ -118,6 +124,36 @@ public class Game extends JComponent implements ActionListener {
             g2.drawString("DEALER SCORE: ****", 50, 80);
             dealerCardList.get(0).printCards(g2, true, 0, -1);
         }
+
+        //清算结束界面打印结果
+        if (this.isEnd==true){
+            for (int indx=0;indx<5;indx++){
+                String path ;
+                switch (resultList.get(indx)){
+                    case 0:
+                        path = "resources/even.png";
+                        break;
+                    case 1:
+                        path = "resources/winner.png";
+                        break;
+                    case 2:
+                        path = "resources/loser.png";
+                        break;
+                    case 3:
+                        path = "resources/bomb.png";
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + resultList.get(indx));
+                }
+                try {
+                    resultImg = ImageIO.read(new File(path));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(Integer.toString(resultList.get(indx)));
+                g2.drawImage(resultImg,180 + PLAYER_AREA_WIDTH * indx ,200,100, 150,null);
+                }
+            }
 
         //将按钮添加到这个frame里面
         super.add(btnBet);
@@ -179,11 +215,17 @@ public class Game extends JComponent implements ActionListener {
                 JOptionPane.showMessageDialog(null, "庄家摸牌完毕，开始清算。");
                 for (GameParticipate player : playerList) {
                     if (!player.isEnd) {
-                        dealer.liquidateAssets(player);
+                        int gameresult = dealer.liquidateAssets(player);
+                        resultList.add(gameresult);
+                    }
+                    else
+                    {
+                        resultList.add(3);
+                        showresult=showresult+"玩家"+player.id+"已出局"+"\n";
                     }
                 }
                 this.isEnd = true;
-
+                JOptionPane.showMessageDialog(null, "最终结果 " + '\n' + showresult);
                 repaint();
             }
             else if (currantPlayer.isBet()){
@@ -272,6 +314,11 @@ public class Game extends JComponent implements ActionListener {
             dealer.dealCard(playerList.get(i));
         }
         pointer = 0;
+
+        //结果列表清零
+        resultList.clear();
+        showresult="";
+
     }
 
     private void setButton() {
