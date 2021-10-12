@@ -17,6 +17,8 @@ public abstract class GameParticipate {
     public int id = -1;
     // 用户赌注
     public int moneyToBet = 0;
+    //一轮只能下一次注
+    public boolean flag = true;
 
     // 判断当前用户是否摸牌
     public abstract boolean checkIfDrawCard();
@@ -43,7 +45,9 @@ public abstract class GameParticipate {
     }
 
     // 手牌数
-    public int getHandSize() {return hand.hands.size();}
+    public int getHandSize() {
+        return hand.hands.size();
+    }
 
     // 当前得分
     public int getScore() {
@@ -72,5 +76,6 @@ public abstract class GameParticipate {
     public void clear() {
         hand.clearHand();
         isEnd = false;
+        flag = true;
     }
 }

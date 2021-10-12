@@ -29,6 +29,7 @@ public class Game extends JComponent implements ActionListener {
     private boolean isEnd;
     GameParticipate currantPlayer;
 
+
     //游戏的主界面一共有五个按钮，分别是HIT STAND EXIT BET RESET
     private JButton btnHit = new JButton("HIT"); // 玩家点击HIT来获得自己牌
     private JButton btnStand = new JButton("STAND"); // 玩家点击STAND结束本局
@@ -36,7 +37,7 @@ public class Game extends JComponent implements ActionListener {
     private JButton btnBet = new JButton("BET"); // 下注
     private JButton btnReStart = new JButton("RESET"); // 重新开始
 
-    public Game(){
+    public Game() {
         //增加每一个按钮的监听
         btnExit.addActionListener(this);
         btnHit.addActionListener(this);
@@ -58,7 +59,7 @@ public class Game extends JComponent implements ActionListener {
 
     //构建gameFrame的界面
     @Override
-    public void paintComponent(Graphics g){
+    public void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
         g2.setFont(new Font("Comic Sans MS", Font.BOLD, 30));
         g2.setColor(Color.WHITE);
@@ -66,15 +67,14 @@ public class Game extends JComponent implements ActionListener {
 
         try {
             backgroundImg = ImageIO.read(new File("resources/background.png")); //读取背景
-        }
-        catch(IOException e) {
+        } catch (IOException e) {
             System.out.println("背景图片读取失败");
         }
-        g2.drawImage(backgroundImg,0,0,1530, 865,null);
+        g2.drawImage(backgroundImg, 0, 0, 1530, 865, null);
 
         if (pointer < playerList.size()) {
             currantPlayer = playerList.get(pointer);
-        } else{
+        } else {
             currantPlayer = dealer;
         }
 
@@ -110,7 +110,7 @@ public class Game extends JComponent implements ActionListener {
         if (pointer >= playerList.size()) {
             g2.setColor(Color.RED);
             g2.drawString("DEALER SCORE: " + dealer.getScore(), 50, 80);
-            for (int i = 0; i < dealerCardList.size(); i++){
+            for (int i = 0; i < dealerCardList.size(); i++) {
                 dealerCardList.get(i).printCards(g2, true, i, -1);
             }
         } else {
@@ -129,17 +129,17 @@ public class Game extends JComponent implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        JButton selectedButton = (JButton)e.getSource();
+        JButton selectedButton = (JButton) e.getSource();
 
         //如果是EXIT则回到主界面
-        if (selectedButton == btnExit){
+        if (selectedButton == btnExit) {
             App.gameFrame.dispose();
             App.currentState = App.STATE.MENU; // 将现在的状态切换成MENU
             App.initMenu();
         }
 
         //全部重新开始
-        if (selectedButton == btnReStart){
+        if (selectedButton == btnReStart) {
             restart();
             repaint();
         }
@@ -150,14 +150,14 @@ public class Game extends JComponent implements ActionListener {
         }
 
         //给玩家发牌
-        if (selectedButton == btnHit && pointer < playerList.size()){
+        if (selectedButton == btnHit && pointer < playerList.size()) {
             // 判断玩家是否已经下注，如果未下注那么我们将出现提示，下了注之后才能开始游戏
-            if (currantPlayer.isBet()){
+            if (currantPlayer.isBet()) {
                 dealer.dealCard(currantPlayer);
                 repaint();
-
+                currantPlayer.flag = false;
                 //如果玩家爆牌了，直接退出游戏
-                if (currantPlayer.isBomb()){
+                if (currantPlayer.isBomb()) {
                     JOptionPane.showMessageDialog(null, "Player " + currantPlayer.id + " fail!");
                     dealer.liquidateAssets(currantPlayer);
                     currantPlayer.isEnd = true;
@@ -165,15 +165,15 @@ public class Game extends JComponent implements ActionListener {
 
                     checkIfDealerTurn();
                 }
-            }
-            else {
+            } else {
                 JOptionPane.showMessageDialog(null, "Player " + currantPlayer.id + " should bet first.");
             }
             repaint();
         }
 
         //玩家停止抽牌开始比大小
-        if (selectedButton == btnStand){
+        if (selectedButton == btnStand) {
+            currantPlayer.flag = true;
             // 庄家轮次
             if (pointer >= playerList.size()) {
                 JOptionPane.showMessageDialog(null, "庄家摸牌完毕，开始清算。");
@@ -185,53 +185,55 @@ public class Game extends JComponent implements ActionListener {
                 this.isEnd = true;
 
                 repaint();
-            }
-            else if (currantPlayer.isBet()){
+            } else if (currantPlayer.isBet()) {
+                currantPlayer.flag = false;
                 pointer++;
                 checkIfDealerTurn();
-            }
-            else {
+            } else {
                 JOptionPane.showMessageDialog(null, "Player " + currantPlayer.id + " should bet first.");
             }
             repaint();
         }
 
         //下注，在下注这边，一定要注意玩家的本金不能小于零，并且有能力在输了之后赔钱
-        if (selectedButton == btnBet && pointer < playerList.size()){
-            String[] options = new String[] {"1", "5", "10", "25", "100"};
+        if (selectedButton == btnBet && pointer < playerList.size()) {
+            String[] options = new String[]{"1", "5", "10", "25", "100"};
             int response = JOptionPane.showOptionDialog(null, "Please enter your betting amount!", "BETTING",
                     JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
-            if (response == 0){
-                if(currantPlayer.money >= 1){
+
+            if (response == 0 && currantPlayer.flag) {
+                if (currantPlayer.money >= 1) {
                     currantPlayer.money -= 1;
                     currantPlayer.moneyToBet = 1;
+                    currantPlayer.flag = false;
                 }
-            }
-            else if (response == 1){
-                if(currantPlayer.money >= 5){
+            } else if (response == 1 && currantPlayer.flag) {
+                if (currantPlayer.money >= 5) {
                     currantPlayer.money -= 5;
                     currantPlayer.moneyToBet = 5;
+                    currantPlayer.flag = false;
                 }
-            }
-            else if (response == 2){
-                if(currantPlayer.money >= 10){
+            } else if (response == 2 && currantPlayer.flag) {
+                if (currantPlayer.money >= 10) {
                     currantPlayer.money -= 10;
                     currantPlayer.moneyToBet = 10;
+                    currantPlayer.flag = false;
                 }
-            }
-            else if (response == 3){
-                if(currantPlayer.money >= 25){
+            } else if (response == 3 && currantPlayer.flag) {
+                if (currantPlayer.money >= 25) {
                     currantPlayer.money -= 25;
                     currantPlayer.moneyToBet = 25;
+                    currantPlayer.flag = false;
                 }
-            }
-            else if (response == 4){
-                if(currantPlayer.money >= 100){
+            } else if (response == 4 && currantPlayer.flag) {
+                if (currantPlayer.money >= 100) {
                     currantPlayer.money -= 100;
                     currantPlayer.moneyToBet = 100;
+                    currantPlayer.flag = false;
                 }
-            }
-            else {
+            } else if (currantPlayer.flag == false) {
+                JOptionPane.showMessageDialog(null, "玩家一轮只能下一次注！请摸牌或者摊牌！");
+            } else {
                 JOptionPane.showMessageDialog(null, "输入不合法！请重新选择");
             }
             repaint();
@@ -249,7 +251,7 @@ public class Game extends JComponent implements ActionListener {
     }
 
     //单局的重新开始
-    private void restart(){
+    private void restart() {
         this.isEnd = false;
         System.out.println("游戏开始新一局");
 
@@ -257,6 +259,7 @@ public class Game extends JComponent implements ActionListener {
         dealer.clear();
         for (GameParticipate player : playerList) {
             player.clear();
+            player.flag = true;
         }
 
         // 洗牌
