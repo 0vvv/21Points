@@ -4,8 +4,15 @@ import entity.GameParticipate;
 import entity.IDealer;
 import entity.IDeck;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static app.Game.showresult;
+
 public class Dealer extends GameParticipate implements IDealer {
     private IDeck deck;
+
+
 
     @Override
     public void dealCard(GameParticipate gameParticipate) {
@@ -27,51 +34,61 @@ public class Dealer extends GameParticipate implements IDealer {
 
     @Override
     public int liquidateAssets(GameParticipate gameParticipate) {
+
         if (gameParticipate.getScore() <= 21 && this.getScore() < gameParticipate.getScore()) {
             this.giveMoney(gameParticipate, 1);
             System.out.println("庄家点数小于玩家，玩家" + gameParticipate.id + "胜利，玩家余额:" + gameParticipate.money);
+            showresult=showresult+"庄家点数小于玩家，玩家" + gameParticipate.id + "胜利，玩家余额:" + gameParticipate.money+'\n';
             return 1;
         }
         else if (this.getScore() <= 21 && this.getScore() > gameParticipate.getScore()) {
             this.receiveMoney(gameParticipate);
             System.out.println("庄家点数大于玩家，玩家" + gameParticipate.id + "失败，玩家余额:" + gameParticipate.money);
+            showresult=showresult+"庄家点数大于玩家，玩家" + gameParticipate.id + "失败，玩家余额:" + gameParticipate.money+'\n';
             return 2;
         }
         else if (this.getScore() == 21 && gameParticipate.getScore() == 21) {
             if ((gameParticipate.isBlackJack() && this.isBlackJack()) ) {
                 this.giveMoney(gameParticipate, 0);
                 System.out.println("庄家和玩家" + gameParticipate.id + "都为BlackJack"  + "平局，玩家余额:" + gameParticipate.money);
+                showresult=showresult+"庄家和玩家" + gameParticipate.id + "都为BlackJack"  + "平局，玩家余额:" + gameParticipate.money+'\n';
                 return 0;
             }
             else if (this.getHandSize() == gameParticipate.getHandSize()){
                 this.giveMoney(gameParticipate, 0);
                 System.out.println("庄家和玩家" + gameParticipate.id + "都为21点且牌数相等" + "平局，玩家余额:" + gameParticipate.money);
+                showresult=showresult+"庄家和玩家" + gameParticipate.id + "都为21点且牌数相等" + "平局，玩家余额:" + gameParticipate.money+'\n';
                 return 0;
             }
             else if (gameParticipate.isBlackJack() || gameParticipate.getHandSize() < this.getHandSize()) {
                 this.giveMoney(gameParticipate, 1);
                 System.out.println("庄家和玩家都为21点，玩家" + gameParticipate.id + "的牌更好，胜利，玩家余额:" + gameParticipate.money);
+                showresult=showresult+"庄家和玩家都为21点，玩家" + gameParticipate.id + "的牌更好，胜利，玩家余额:" + gameParticipate.money+'\n';
                 return 1;
             }
             else {
                 this.receiveMoney(gameParticipate);
                 System.out.println("庄家和玩家" + gameParticipate.id + "都为21点，庄家的牌更好，胜利，玩家余额:" + gameParticipate.money);
+                showresult=showresult+"庄家和玩家" + gameParticipate.id + "都为21点，庄家的牌更好，胜利，玩家余额:" + gameParticipate.money+'\n';
                 return 2;
             }
         }
         else if (this.isBomb()) {
             this.giveMoney(gameParticipate, 1);
             System.out.println("庄家爆掉，玩家" + gameParticipate.id + "胜利，玩家余额:" + gameParticipate.money);
+            showresult=showresult+"庄家爆掉，玩家" + gameParticipate.id + "胜利，玩家余额:" + gameParticipate.money+'\n';
             return 1;
         }
         else if (gameParticipate.isBomb()){
             this.receiveMoney(gameParticipate);
             System.out.println("玩家" + gameParticipate.id + "爆掉，庄家胜利，玩家余额:" + gameParticipate.money);
+            //showresult=showresult+"玩家" + gameParticipate.id + "爆掉，庄家胜利，玩家余额:" + gameParticipate.money+'\n';
             return 2;
         }
         else if (this.getScore() == gameParticipate.getScore()) {
             this.giveMoney(gameParticipate, 0);
             System.out.println("庄家和玩家" + gameParticipate.id + "点数相等，" + "平局，玩家余额:" + gameParticipate.money);
+            showresult=showresult+"庄家和玩家" + gameParticipate.id + "点数相等，" + "平局，玩家余额:" + gameParticipate.money+'\n';
             return 0;
         }
         else {
