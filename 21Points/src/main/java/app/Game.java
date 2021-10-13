@@ -127,7 +127,7 @@ public class Game extends JComponent implements ActionListener {
 
         //清算结束界面打印结果
         if (this.isEnd==true){
-            for (int indx=0;indx<5;indx++){
+            for (int indx = 0; indx < playerList.size(); indx++){
                 String path ;
                 switch (resultList.get(indx)){
                     case 0:
@@ -169,15 +169,28 @@ public class Game extends JComponent implements ActionListener {
 
         //如果是EXIT则回到主界面
         if (selectedButton == btnExit) {
+            restart();
+            for (GameParticipate player : playerList) {
+                player.resetMoney(500);
+            }
             App.gameFrame.dispose();
             App.currentState = App.STATE.MENU; // 将现在的状态切换成MENU
             App.initMenu();
+
+
         }
 
         //全部重新开始
         if (selectedButton == btnReStart) {
-            restart();
-            repaint();
+            if (this.isEnd) {
+                restart();
+                repaint();
+
+
+            }
+            else{
+                JOptionPane.showMessageDialog(null, "本局游戏尚未结束，请游戏结束后重置");
+            }
         }
 
         if (this.isEnd) {
