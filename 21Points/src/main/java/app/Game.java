@@ -250,8 +250,12 @@ public class Game extends JComponent implements ActionListener {
             repaint();
         }
 
-        //下注，在下注这边，一定要注意玩家的本金不能小于零，并且有能力在输了之后赔钱
-        if (selectedButton == btnBet && pointer < playerList.size()) {
+        //下注，在下注这边，一定要注意玩家的本金不能小于零，并且有能力在输了之后赔钱,并且玩家之前没有下过注
+        if (selectedButton == btnBet && pointer < playerList.size() ) {
+            if (currantPlayer.flag == false) {
+                JOptionPane.showMessageDialog(null, "玩家一轮只能下一次注！请摸牌或者摊牌！");
+            }
+            else{
             String[] options = new String[]{"1", "5", "10", "25", "100"};
             int response = JOptionPane.showOptionDialog(null, "Please enter your betting amount!", "BETTING",
                     JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
@@ -286,13 +290,12 @@ public class Game extends JComponent implements ActionListener {
                     currantPlayer.moneyToBet = 100;
                     currantPlayer.flag = false;
                 }
-            } else if (currantPlayer.flag == false) {
-                JOptionPane.showMessageDialog(null, "玩家一轮只能下一次注！请摸牌或者摊牌！");
-            } else {
+            }else {
                 JOptionPane.showMessageDialog(null, "输入不合法！请重新选择");
             }
             repaint();
-        }
+        }}
+
     }
 
     private void checkIfDealerTurn() {
