@@ -78,4 +78,8 @@ public abstract class GameParticipate {
         isEnd = false;
         flag = true;
     }
+
+    //重置用户资产
+    public void resetMoney(int money){
+    }
 }

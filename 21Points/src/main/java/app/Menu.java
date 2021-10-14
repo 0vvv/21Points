@@ -15,10 +15,17 @@ public class Menu extends JComponent implements ActionListener {
     private JButton btnPlay = new JButton("Play");//开始游戏
 
     private static BufferedImage backgroundImage;
+    private BufferedImage menuBGImg;
 
     public Menu(){
         btnExit.addActionListener(this);
         btnPlay.addActionListener(this);
+        try{
+            menuBGImg = ImageIO.read(new File("resources/menubg.jpg"));
+        }
+        catch(IOException e) {
+            System.out.println("背景图片读取失败");
+        }
     }
 
     @Override
@@ -27,9 +34,9 @@ public class Menu extends JComponent implements ActionListener {
 
         g2.setFont(new Font("Comic Sans MS", Font.BOLD, 100));
         g2.setColor(Color.BLACK);
-        g2.drawString("Welcome", 530, 120);
-        g2.drawString("to", 700, 210);
-        g2.drawString("BLACKJACK!", 450, 300);
+
+        g2.drawImage(menuBGImg,0,0,1530,865,null);
+
 
         btnPlay.setBounds(500, 600, 150, 80); //set button bounds
         btnExit.setBounds(800, 600, 150, 80);

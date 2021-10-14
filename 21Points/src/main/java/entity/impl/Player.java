@@ -59,4 +59,9 @@ public class Player extends GameParticipate {
         this.money = money;
         this.id = id;
     }
+
+    @Override
+    public void resetMoney(int money){
+        this.money = money;
+    }
 }

@@ -127,7 +127,7 @@ public class Game extends JComponent implements ActionListener {
 
         //清算结束界面打印结果
         if (this.isEnd==true){
-            for (int indx=0;indx<5;indx++){
+            for (int indx = 0; indx < playerList.size(); indx++){
                 String path ;
                 switch (resultList.get(indx)){
                     case 0:
@@ -169,15 +169,28 @@ public class Game extends JComponent implements ActionListener {
 
         //如果是EXIT则回到主界面
         if (selectedButton == btnExit) {
+            restart();
+            for (GameParticipate player : playerList) {
+                player.resetMoney(500);
+            }
             App.gameFrame.dispose();
             App.currentState = App.STATE.MENU; // 将现在的状态切换成MENU
             App.initMenu();
+
+
         }
 
         //全部重新开始
         if (selectedButton == btnReStart) {
-            restart();
-            repaint();
+            if (this.isEnd) {
+                restart();
+                repaint();
+
+
+            }
+            else{
+                JOptionPane.showMessageDialog(null, "本局游戏尚未结束，请游戏结束后重置");
+            }
         }
 
         if (this.isEnd) {
@@ -237,8 +250,12 @@ public class Game extends JComponent implements ActionListener {
             repaint();
         }
 
-        //下注，在下注这边，一定要注意玩家的本金不能小于零，并且有能力在输了之后赔钱
-        if (selectedButton == btnBet && pointer < playerList.size()) {
+        //下注，在下注这边，一定要注意玩家的本金不能小于零，并且有能力在输了之后赔钱,并且玩家之前没有下过注
+        if (selectedButton == btnBet && pointer < playerList.size() ) {
+            if (currantPlayer.flag == false) {
+                JOptionPane.showMessageDialog(null, "玩家一轮只能下一次注！请摸牌或者摊牌！");
+            }
+            else{
             String[] options = new String[]{"1", "5", "10", "25", "100"};
             int response = JOptionPane.showOptionDialog(null, "Please enter your betting amount!", "BETTING",
                     JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
@@ -273,13 +290,12 @@ public class Game extends JComponent implements ActionListener {
                     currantPlayer.moneyToBet = 100;
                     currantPlayer.flag = false;
                 }
-            } else if (currantPlayer.flag == false) {
-                JOptionPane.showMessageDialog(null, "玩家一轮只能下一次注！请摸牌或者摊牌！");
-            } else {
+            }else {
                 JOptionPane.showMessageDialog(null, "输入不合法！请重新选择");
             }
             repaint();
-        }
+        }}
+
     }
 
     private void checkIfDealerTurn() {
